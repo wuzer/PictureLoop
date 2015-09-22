@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "PictureLoopViewController.h"
 
 @interface AppDelegate ()
 
@@ -16,7 +17,15 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
+    
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    
+    PictureLoopViewController *vc = [[PictureLoopViewController alloc] init];
+    vc.view.backgroundColor = [UIColor whiteColor];
+    
+    self.window.rootViewController = vc;
+    [self.window makeKeyAndVisible];
+    
     return YES;
 }
 

@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  PictureLoopViewController.h
 //  PictureLoop
 //
 //  Created by Jefferson on 15/9/22.
@@ -8,8 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
-
+@interface PictureLoopViewController : UIViewController
 
 @end
-
