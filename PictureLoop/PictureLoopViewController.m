@@ -15,12 +15,14 @@
 @interface PictureLoopViewController () <UIScrollViewDelegate>
 
 @property (nonatomic, strong) UIScrollView *scrollView;
-@property (nonatomic, strong) UIImageView *leftImageView;
-@property (nonatomic, strong) UIImageView *currentImageView;
-@property (nonatomic, strong) UIImageView *rightImageView;
 
+// 核心
+@property (nonatomic, strong) NSMutableSet *visibleImageViews;
+@property (nonatomic, strong) NSMutableSet *reusedImageViews;
+
+// 图片数组
+@property (nonatomic, strong) NSArray *imageNames;
 @property (nonatomic, strong) UIPageControl *pageControl;
-@property (nonatomic, assign) NSInteger currentPage;
 
 @end
 
@@ -29,38 +31,119 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    [self layoutSubViews];
+    [self addScrollView];
+    [self addPageControl];
 }
 
 // 添加scrollView
 - (void)addScrollView {
     
-    self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, Kwidth, 200)];
-    self.scrollView.contentSize = CGSizeMake(Kwidth * 5, 200);
-    self.scrollView.contentOffset = CGPointMake(Kwidth, 0);
+    self.scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
+    self.scrollView.contentSize = CGSizeMake(self.imageNames.count * CGRectGetWidth(_scrollView.bounds), 0);
+//    NSLog(@"%zd", self.imageNames.count);
+//    self.scrollView.contentOffset = CGPointMake(Kwidth, 0);
     self.scrollView.pagingEnabled = YES;
     self.scrollView.showsHorizontalScrollIndicator = NO;
     self.scrollView.delegate = self;
-    self.scrollView.backgroundColor = [UIColor redColor];
+    self.scrollView.backgroundColor = [UIColor whiteColor];
     
     [self.view addSubview:self.scrollView];
+//    self.scrollView = scrollView;
+    [self showImageViewAtIndex:0];
 }
 
-// 添加图片
-- (void)addImageViewToScrollView {
+#pragma mark - UIScrollViewDelegate
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     
-    self.leftImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, Kwidth, Kheight)];
-    self.currentImageView = [[UIImageView alloc] initWithFrame:CGRectMake(Kwidth, 0, Kwidth, Kheight)];
-    self.rightImageView = [[UIImageView alloc] initWithFrame:CGRectMake(Kwidth * 2, 0, Kwidth, Kheight)];
+    [self showCurrentImages];
+    [self test];
+}
+
+- (void)test {
+    NSMutableString *rs = [NSMutableString string];
+    NSInteger count = [self.scrollView.subviews count];
+    for (UIImageView *imageView in self.scrollView.subviews) {
+        [rs appendFormat:@"%p - ", imageView];
+    }
+    [rs appendFormat:@"%ld", (long)count];
+    NSLog(@"%@", rs);
+}
+
+#pragma mark - Private Method
+
+- (void)showCurrentImages {
     
-    self.leftImageView.contentMode = UIViewContentModeScaleAspectFit;
-    self.currentImageView.contentMode = UIViewContentModeScaleAspectFit;
-    self.rightImageView.contentMode = UIViewContentModeScaleAspectFit;
+    // 获取当前索引
+    CGRect visibleBounds = self.scrollView.bounds;
+    CGFloat minX = CGRectGetMinX(visibleBounds);
+    CGFloat maxX = CGRectGetMaxX(visibleBounds);
+    CGFloat width = CGRectGetWidth(visibleBounds);
     
-    [self.view addSubview:self.leftImageView];
-    [self.view addSubview:self.currentImageView];
-    [self.view addSubview:self.rightImageView];
+    NSInteger firstIndex = (NSInteger)floorf(minX / width);
+    NSInteger lastIndex = (NSInteger)floorf(maxX / width);
     
+//     处理越界情况
+    if (firstIndex < 0) {
+        firstIndex = 0;
+    }
+    
+    if (lastIndex >= self.imageNames.count) {
+        lastIndex = self.imageNames.count - 1;
+    }
+    
+    // 回收不需要显示的图片
+    NSInteger imageViewIndex = 0;
+    for (UIImageView *imageView in self.visibleImageViews) {
+        imageViewIndex = imageView.tag;
+        
+        // 不在显示范围
+        if (imageViewIndex < firstIndex || imageViewIndex > lastIndex) {
+            [self.reusedImageViews addObject:imageView];
+            [imageView removeFromSuperview];
+        }
+    }
+    
+    [self.visibleImageViews minusSet:self.reusedImageViews];
+    
+    // 是否需要新的视图
+    for (NSInteger index = firstIndex; index <= lastIndex; index++) {
+        BOOL isShow = NO;
+        NSLog(@"%zd",index);
+        for (UIImageView *imageView  in self.visibleImageViews) {
+            if (imageView.tag == index) {
+                isShow = YES;
+            }
+        }
+        
+        if (!isShow) {
+            // TODO: 待续
+            [self showImageViewAtIndex:index];
+        }
+    }
+}
+
+// 显示一个图片的view
+- (void)showImageViewAtIndex:(NSInteger)index {
+    
+    UIImageView *imageView = [self.reusedImageViews anyObject];
+    
+    if (imageView) {
+        [self.reusedImageViews removeObject:imageView];
+    } else {
+        
+        imageView = [[UIImageView alloc] init];
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
+    }
+    CGRect bounds = self.scrollView.bounds;
+    CGRect imageViewFrame = bounds;
+    imageViewFrame.origin.x = CGRectGetWidth(bounds) * index;
+    imageView.tag = index;
+    imageView.frame = imageViewFrame;
+    imageView.image = [UIImage imageNamed:self.imageNames[index]];
+    
+    [self.visibleImageViews addObject:imageView];
+    [self.scrollView addSubview:imageView];
 }
 
 // 分页控件
@@ -74,31 +157,37 @@
     [self.view addSubview:self.pageControl];
 }
 
-- (void)setImageByCurrentPage:(NSInteger)currentPage {
+#pragma mark - Getters and Setters
+
+- (NSArray *)imageNames {
     
-    NSArray *images = @[@"bbqner", @"zghsy", @"mmgw", @"jxtz", @"ertsd"];
-    
-    self.leftImageView.image = [UIImage imageNamed:[NSString stringWithFormat:@"%d",KpageCount - 1]];
-    self.currentImageView.image = [UIImage imageNamed:[NSString stringWithFormat:@"%d",0]];
-    self.rightImageView.image = [UIImage imageNamed:[NSString stringWithFormat:@"%d",0]];
-    currentPage = 0;
-    
-    self.pageControl.currentPage = currentPage;
-    
-    
-    
-    
-    
+    if (_imageNames == nil) {
+        NSMutableArray *tempArray = [NSMutableArray arrayWithCapacity:50];
+        
+        for (int i=0; i < 50; ++i) {
+            NSString *imageName = [NSString stringWithFormat:@"%d",i % 6];
+            NSLog(@"%d",i);
+            [tempArray addObject:imageName];
+        }
+        _imageNames = tempArray;
+    }
+    return _imageNames;
 }
 
-// 布局控件
-- (void)layoutSubViews {
+- (NSMutableSet *)visibleImageViews {
     
-    [self addScrollView];
-    [self addImageViewToScrollView];
-    [self addPageControl];
+    if (!_visibleImageViews) {
+        _visibleImageViews = [[NSMutableSet alloc] init];
+    }
+    return _visibleImageViews;
 }
 
-
+- (NSMutableSet *)reusedImageViews {
+    
+    if (!_reusedImageViews) {
+        _reusedImageViews = [[NSMutableSet alloc] init];
+    }
+    return _reusedImageViews;
+}
 
 @end
