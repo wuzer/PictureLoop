@@ -12,6 +12,7 @@
 		840D6C601BB16C5B00ECC317 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 840D6C5F1BB16C5B00ECC317 /* Assets.xcassets */; };
 		840D6C631BB16C5B00ECC317 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 840D6C611BB16C5B00ECC317 /* LaunchScreen.storyboard */; };
 		840D6C6C1BB16D7300ECC317 /* PictureLoopViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840D6C6B1BB16D7300ECC317 /* PictureLoopViewController.m */; settings = {ASSET_TAGS = (); }; };
+		840D6C751BB240AD00ECC317 /* PictureLoopView.m in Sources */ = {isa = PBXBuildFile; fileRef = 840D6C741BB240AD00ECC317 /* PictureLoopView.m */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,8 @@
 		840D6C641BB16C5B00ECC317 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		840D6C6A1BB16D7300ECC317 /* PictureLoopViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PictureLoopViewController.h; sourceTree = "<group>"; };
 		840D6C6B1BB16D7300ECC317 /* PictureLoopViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PictureLoopViewController.m; sourceTree = "<group>"; };
+		840D6C731BB240AD00ECC317 /* PictureLoopView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PictureLoopView.h; sourceTree = "<group>"; };
+		840D6C741BB240AD00ECC317 /* PictureLoopView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PictureLoopView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +63,8 @@
 				840D6C571BB16C5B00ECC317 /* AppDelegate.m */,
 				840D6C6A1BB16D7300ECC317 /* PictureLoopViewController.h */,
 				840D6C6B1BB16D7300ECC317 /* PictureLoopViewController.m */,
+				840D6C731BB240AD00ECC317 /* PictureLoopView.h */,
+				840D6C741BB240AD00ECC317 /* PictureLoopView.m */,
 				840D6C5F1BB16C5B00ECC317 /* Assets.xcassets */,
 				840D6C611BB16C5B00ECC317 /* LaunchScreen.storyboard */,
 				840D6C641BB16C5B00ECC317 /* Info.plist */,
@@ -147,6 +152,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				840D6C6C1BB16D7300ECC317 /* PictureLoopViewController.m in Sources */,
+				840D6C751BB240AD00ECC317 /* PictureLoopView.m in Sources */,
 				840D6C581BB16C5B00ECC317 /* AppDelegate.m in Sources */,
 				840D6C551BB16C5B00ECC317 /* main.m in Sources */,
 			);
